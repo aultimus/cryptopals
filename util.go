@@ -29,16 +29,22 @@ func HexStringToBase64String(h string) string {
 	return string(b64)
 }
 
-// Xor takes two equal length buffers and returns their XOR combination
+// Xor takes two buffers and returns their XOR combination
+// b2 can be shorter in length than b1, if so b2 will repeat
 func Xor(b1, b2 []byte) []byte {
 	l := len(b1)
-	if len(b2) != l {
-		panic(fmt.Sprintf("Xor does not accept unequal length args len(b1)=%d, len(b2)=%d",
+	if len(b2) > l {
+		panic(fmt.Sprintf("Xor does not accept b2 longer than b1, args len(b1)=%d, len(b2)=%d",
 			len(b1), len(b2)))
 	}
 	out := make([]byte, l)
+	b2Index := 0
 	for i := 0; i < l; i++ {
-		out[i] = b1[i] ^ b2[i]
+		out[i] = b1[i] ^ b2[b2Index]
+		b2Index++
+		if b2Index == len(b2) {
+			b2Index = 0
+		}
 	}
 	return out
 }
@@ -56,10 +62,7 @@ func BruteforceXOR(bIn1 []byte) *Result {
 	// cycle through possible cyphers
 	for i := 0; i < 128; i++ {
 		// construct equal sized cypher array for passing to Xor
-		bIn2 := make([]byte, len(bIn1))
-		for j := 0; j < len(bIn1); j++ {
-			bIn2[j] = byte(i)
-		}
+		bIn2 := []byte{byte(i)}
 		s := string(Xor(bIn1, bIn2))
 		r := &Result{
 			Plaintext: s,
