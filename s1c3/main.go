@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/hex"
+	"strings"
 
 	"github.com/aultimus/cryptopals"
 	"github.com/davecgh/go-spew/spew"
@@ -20,35 +21,37 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	var scores = make([]*result, 255, 255)
+	topResult := &result{}
+	n := 128
 	// cycle through possible cyphers
-	for i := 0; i < 255; i++ {
+	for i := 0; i < n; i++ {
 		// construct equal sized cypher array for passing to Xor
 		bIn2 := make([]byte, len(bIn1))
 		for j := 0; j < len(bIn1); j++ {
 			bIn2[j] = byte(i)
 		}
-		s := hex.EncodeToString(cryptopals.Xor(bIn1, bIn2))
-		scores[i] = &result{
+		s := string(cryptopals.Xor(bIn1, bIn2))
+		r := &result{
 			plaintext: s,
 			cypher:    i,
 			score:     score(s),
 		}
+		if r.score > topResult.score {
+			topResult = r
+		}
 	}
-	spew.Dump(scores)
-
+	spew.Dump(topResult)
 }
 
 func score(s string) int {
-	var c int
+	popular := "uldrhsnioate" // "etaoinshrdlu" // reversed
+
+	var total int
 	for i := 0; i < len(s); i++ {
-		ch := s[i]
-		for n := 0; n < 10; n++ {
-			if ch == string(n) { // strconv probably
-				c--
-				break
-			}
+		subscore := strings.Index(popular, string(s[i]))
+		if subscore != -1 {
+			total += subscore
 		}
 	}
-	return c
+	return total
 }
