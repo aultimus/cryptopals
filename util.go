@@ -91,3 +91,23 @@ func ScorePlaintext(s string) int {
 	}
 	return total
 }
+
+func HammingDistance(b1, b2 []byte) int {
+	if len(b1) != len(b2) {
+		panic(fmt.Sprintf("HammingDistance called with different length buffers len(b1)=%d, len(b2)=%d",
+			len(b1), len(b2)))
+	}
+
+	var total int
+	for i := 0; i < len(b1); i++ {
+		// xor args, thus val represents the number of bits set
+		val := b1[i] ^ b2[i]
+
+		// increment total by one and clear a bit
+		for val != 0 {
+			total++
+			val &= val - 1
+		}
+	}
+	return total
+}

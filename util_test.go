@@ -48,3 +48,10 @@ I go crazy when I hear a cymbal`
 	actualStr := hex.EncodeToString(actualBytes)
 	a.Equal(expected, actualStr)
 }
+
+func TestHammingDistance(t *testing.T) {
+	a := assert.New(t)
+
+	actual := HammingDistance([]byte("this is a test"), []byte("wokka wokka!!!"))
+	a.Equal(37, actual)
+}
