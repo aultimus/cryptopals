@@ -51,7 +51,10 @@ I go crazy when I hear a cymbal`
 
 func TestHammingDistance(t *testing.T) {
 	a := assert.New(t)
-
-	actual := HammingDistance([]byte("this is a test"), []byte("wokka wokka!!!"))
-	a.Equal(37, actual)
+	b1 := []byte("this is a test")
+	b2 := []byte("wokka wokka!!!")
+	a.Equal(37, HammingDistance(b1, b2))
+	a.Equal((37*4)/6, HammingDistance(b1, b2, b1, b2))
+	a.Equal((37*4)/6, HammingDistance(b1, b1, b2, b2))
+	a.Equal(0, HammingDistance(b1, b1, b1))
 }

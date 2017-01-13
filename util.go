@@ -100,9 +100,28 @@ func ScorePlaintext(s string) int {
 	return total
 }
 
-func HammingDistance(b1, b2 []byte) int {
+func HammingDistance(bs ...[]byte) int {
+	var total int
+	if len(bs) < 2 {
+		panic(fmt.Sprintf("HammingDistanceAverage called with only %d args, requires at least 2",
+			len(bs)))
+	}
+	var numIter int
+	for i := 0; i < len(bs); i++ {
+		for j := i + 1; j < len(bs); j++ {
+			dist := hammingDistanceImpl(bs[i], bs[j])
+			//fmt.Printf("%d %d has distance of %d\n", i, j, dist)
+			total += dist
+			numIter++
+		}
+	}
+	total /= numIter
+	return total
+}
+
+func hammingDistanceImpl(b1, b2 []byte) int {
 	if len(b1) != len(b2) {
-		panic(fmt.Sprintf("HammingDistance called with different length buffers len(b1)=%d, len(b2)=%d",
+		panic(fmt.Sprintf("hammingDistanceImpl called with different length buffers len(b1)=%d, len(b2)=%d",
 			len(b1), len(b2)))
 	}
 
