@@ -100,8 +100,8 @@ func ScorePlaintext(s string) int {
 	return total
 }
 
-func HammingDistance(bs ...[]byte) int {
-	var total int
+func HammingDistance(bs ...[]byte) float64 {
+	var total float64
 	if len(bs) < 2 {
 		panic(fmt.Sprintf("HammingDistanceAverage called with only %d args, requires at least 2",
 			len(bs)))
@@ -115,17 +115,17 @@ func HammingDistance(bs ...[]byte) int {
 			numIter++
 		}
 	}
-	total /= numIter
+	total /= float64(numIter)
 	return total
 }
 
-func hammingDistanceImpl(b1, b2 []byte) int {
+func hammingDistanceImpl(b1, b2 []byte) float64 {
 	if len(b1) != len(b2) {
 		panic(fmt.Sprintf("hammingDistanceImpl called with different length buffers len(b1)=%d, len(b2)=%d",
 			len(b1), len(b2)))
 	}
 
-	var total int
+	var total float64
 	for i := 0; i < len(b1); i++ {
 		// xor args, thus val represents the number of bits set
 		val := b1[i] ^ b2[i]

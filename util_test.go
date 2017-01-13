@@ -53,8 +53,8 @@ func TestHammingDistance(t *testing.T) {
 	a := assert.New(t)
 	b1 := []byte("this is a test")
 	b2 := []byte("wokka wokka!!!")
-	a.Equal(37, HammingDistance(b1, b2))
-	a.Equal((37*4)/6, HammingDistance(b1, b2, b1, b2))
-	a.Equal((37*4)/6, HammingDistance(b1, b1, b2, b2))
-	a.Equal(0, HammingDistance(b1, b1, b1))
+	a.Equal(37.0, HammingDistance(b1, b2))
+	a.Equal((37*4.0)/6, HammingDistance(b1, b2, b1, b2))
+	a.Equal((37*4.0)/6, HammingDistance(b1, b1, b2, b2))
+	a.Equal(0.0, HammingDistance(b1, b1, b1))
 }
