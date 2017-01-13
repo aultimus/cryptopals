@@ -7,9 +7,17 @@ import (
 	"strings"
 )
 
+// Base64Decode decodes a byte array from base64 encoding
+func Base64Decode(src []byte) ([]byte, error) {
+	b := make([]byte, base64.StdEncoding.DecodedLen(len(src)))
+	_, err := base64.StdEncoding.Decode(b, src)
+	return b, err
+}
+
 // HexToBase64 takes a hex encoded byte array and returns a base 64 encoded
 // byte array, a function that only operates upon a byte repr is desirable
 // in terms of effiency
+// TODO: This is not hex specific, rename Base64Encode
 func HexToBase64(src []byte) []byte {
 	// so the different representations - hex and base64 take up different
 	// amounts of bytes
