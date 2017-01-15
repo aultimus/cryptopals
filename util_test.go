@@ -77,3 +77,13 @@ func TestDetermineKeysize(t *testing.T) {
 	keysize, _ := DetermineKeysize(b)
 	a.Equal(29, keysize)
 }
+
+func TestC3(t *testing.T) {
+	a := assert.New(t)
+
+	in := "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+	bIn1, err := hex.DecodeString(in)
+	a.NoError(err)
+	r := BruteforceXOR(bIn1)
+	a.Equal("Cooking MC's like a pound of bacon", r.Plaintext)
+}
