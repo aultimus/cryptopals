@@ -59,7 +59,7 @@ func Xor(b1, b2 []byte) []byte {
 
 type Result struct {
 	Plaintext string
-	Cypher    int
+	Cypher    byte
 	Score     int
 }
 
@@ -74,7 +74,7 @@ func BruteforceXOR(bIn1 []byte) *Result {
 		s := string(Xor(bIn1, bIn2))
 		r := &Result{
 			Plaintext: s,
-			Cypher:    i,
+			Cypher:    bIn2[0],
 			Score:     ScorePlaintext(s),
 		}
 		if r.Score > topResult.Score {
