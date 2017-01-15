@@ -20,6 +20,7 @@ func main() {
 		panic(err.Error())
 	}
 
+	// TODO: Refactor out into a function
 	// Determine keysize
 	shortestDistance := 1000.0 // suitably large
 	likelyKeysize := -1
@@ -35,5 +36,50 @@ func main() {
 			likelyKeysize = keysize
 		}
 	}
-	fmt.Printf("Likely keysize %d has normalised hamming distance of %f\n", likelyKeysize, shortestDistance)
+
+	keysize := likelyKeysize
+	fmt.Printf("Likely keysize %d has normalised hamming distance of %f\n", keysize, shortestDistance)
+
+	blocks := makeBlocks(b, keysize, keysize)
+	transposed := transposeBlocks(blocks)
+
+	cypher := make([]byte, keysize)
+	for i, block := range transposed {
+		result := cryptopals.BruteforceXOR(block)
+		cypher[i] = byte(result.Cypher)
+	}
+
+	plaintext := string(cryptopals.Xor(b, cypher))
+	fmt.Println(plaintext)
+}
+
+// TODO: test
+func transposeBlocks(blocks [][]byte) [][]byte {
+	l := len(blocks)
+	if l != len(blocks[0]) {
+		panic(fmt.Sprintf("unable to transpose non square matrix (%d by %d)",
+			l, len(blocks[0])))
+	}
+	transposed := make([][]byte, l)
+	for i := 0; i < l; i++ {
+		transposed[i] = make([]byte, l)
+	}
+
+	for i := 0; i < l; i++ {
+		for j := 0; j < l; j++ {
+			transposed[i][j] = blocks[j][i]
+		}
+	}
+	return transposed
+}
+
+// TODO: test
+func makeBlocks(b []byte, blocksize, numBlocks int) [][]byte {
+	// make blocksize blocks of blocksize length
+	blocks := make([][]byte, numBlocks)
+	for i := 0; i < numBlocks; i++ {
+		blocks[i] = make([]byte, blocksize)
+		blocks[i] = b[blocksize*i : (blocksize*i)+blocksize]
+	}
+	return blocks
 }

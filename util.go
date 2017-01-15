@@ -4,10 +4,10 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"strings"
 )
 
 // Base64Decode decodes a byte array from base64 encoding
+// Seems to be returning too long a slice for s1c6
 func Base64Decode(src []byte) ([]byte, error) {
 	b := make([]byte, base64.StdEncoding.DecodedLen(len(src)))
 	_, err := base64.StdEncoding.Decode(b, src)
@@ -60,7 +60,7 @@ func Xor(b1, b2 []byte) []byte {
 type Result struct {
 	Plaintext string
 	Cypher    byte
-	Score     int
+	Score     float64
 }
 
 // BruteforceXOR searches for a single character XOR cypher that yields the
@@ -85,17 +85,43 @@ func BruteforceXOR(bIn1 []byte) *Result {
 
 }
 
+// Source http://www.data-compression.com/english.html
+var letterFrequency = map[string]float64{
+	"a": 0.0651738,
+	"b": 0.0124248,
+	"c": 0.0217339,
+	"d": 0.0349835,
+	"e": 0.1041442,
+	"f": 0.0197881,
+	"g": 0.0158610,
+	"h": 0.0492888,
+	"i": 0.0558094,
+	"j": 0.0009033,
+	"k": 0.0050529,
+	"l": 0.0331490,
+	"m": 0.0202124,
+	"n": 0.0564513,
+	"o": 0.0596302,
+	"p": 0.0137645,
+	"q": 0.0008606,
+	"r": 0.0497563,
+	"s": 0.0515760,
+	"t": 0.0729357,
+	"u": 0.0225134,
+	"v": 0.0082903,
+	"w": 0.0171272,
+	"x": 0.0013692,
+	"y": 0.0145984,
+	"z": 0.0007836,
+	" ": 0.1918182,
+}
+
 // ScorePlaintext scores a string for confidence that is plaintext, the higher the score,
 // the higher the confidence
-func ScorePlaintext(s string) int {
-	popular := "uldrhsnioate" // "etaoinshrdlu" // reversed
-
-	var total int
+func ScorePlaintext(s string) float64 {
+	var total float64
 	for i := 0; i < len(s); i++ {
-		subscore := strings.Index(popular, string(s[i]))
-		if subscore != -1 {
-			total += subscore
-		}
+		total += letterFrequency[string(s[i])]
 	}
 	return total
 }
