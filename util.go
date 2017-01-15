@@ -164,3 +164,27 @@ func hammingDistanceImpl(b1, b2 []byte) float64 {
 	}
 	return total
 }
+
+// DetermineKeysize determines the likely keysize of an encryption cypher
+// given the encrypted data b. It also returns normalised difference of the
+// blocks of size keysize, this can be considered a sort of confidence, the
+// lower the better
+func DetermineKeysize(b []byte) (int, float64) {
+	// TODO: Refactor out into a function
+	// Determine keysize
+	shortestDistance := 1000.0 // suitably large
+	likelyKeysize := -1
+	for keysize := 2; keysize < 41; keysize++ {
+		b1 := b[:keysize]
+		b2 := b[keysize : keysize*2]
+		b3 := b[keysize*2 : keysize*3]
+		b4 := b[keysize*3 : keysize*4]
+		normDistance := HammingDistance(b1, b2, b3, b4) / float64(keysize)
+		//fmt.Printf("keysize %d, distance %f\n", keysize, normDistance)
+		if normDistance < shortestDistance {
+			shortestDistance = normDistance
+			likelyKeysize = keysize
+		}
+	}
+	return likelyKeysize, shortestDistance
+}

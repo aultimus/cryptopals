@@ -20,25 +20,9 @@ func main() {
 		panic(err.Error())
 	}
 
-	// TODO: Refactor out into a function
-	// Determine keysize
-	shortestDistance := 1000.0 // suitably large
-	likelyKeysize := -1
-	for keysize := 2; keysize < 41; keysize++ {
-		b1 := b[:keysize]
-		b2 := b[keysize : keysize*2]
-		b3 := b[keysize*2 : keysize*3]
-		b4 := b[keysize*3 : keysize*4]
-		normDistance := cryptopals.HammingDistance(b1, b2, b3, b4) / float64(keysize)
-		//fmt.Printf("keysize %d, distance %f\n", keysize, normDistance)
-		if normDistance < shortestDistance {
-			shortestDistance = normDistance
-			likelyKeysize = keysize
-		}
-	}
-
-	keysize := likelyKeysize
-	fmt.Printf("Likely keysize %d has normalised hamming distance of %f\n", keysize, shortestDistance)
+	keysize, distance := cryptopals.DetermineKeysize(b)
+	fmt.Printf("Likely keysize %d has normalised hamming distance of %f\n",
+		keysize, distance)
 
 	blocks := makeBlocks(b, keysize, keysize)
 	transposed := transposeBlocks(blocks)
