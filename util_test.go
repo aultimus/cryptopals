@@ -109,19 +109,7 @@ func TestC4(t *testing.T) {
 	a.Equal("Now that the party is jumping\n", topResult.Plaintext)
 }
 
-func TestC6(t *testing.T) {
-	a := assert.New(t)
-
-	// Read Data
-	b64, err := ioutil.ReadFile("6.txt")
-	a.NoError(err)
-
-	// Decode from base64
-	b, err := Base64Decode(b64)
-	a.NoError(err)
-
-	plaintext := string(BreakRepeatingKeyXOR(b))
-	actualPlaintext := `I'm back and I'm ringin' the bell 
+var icePlaintext = `I'm back and I'm ringin' the bell 
 A rockin' on the mike while the fly girls yell 
 In ecstasy in the back of me 
 Well that's my DJ Deshay cuttin' all them Z's 
@@ -200,5 +188,33 @@ Play that funky music white boy you say it, say it
 Play that funky music A little louder now 
 Play that funky music, white boy Come on, Come on, Come on 
 Play that funky music`
-	a.True(strings.HasPrefix(plaintext, actualPlaintext))
+
+func TestC6(t *testing.T) {
+	a := assert.New(t)
+
+	// Read Data
+	b64, err := ioutil.ReadFile("6.txt")
+	a.NoError(err)
+
+	// Decode from base64
+	b, err := Base64Decode(b64)
+	a.NoError(err)
+
+	plaintext := string(BreakRepeatingKeyXOR(b))
+	a.True(strings.HasPrefix(plaintext, icePlaintext))
+}
+
+func TestC7(t *testing.T) {
+	a := assert.New(t)
+
+	b64, err := ioutil.ReadFile("7.txt")
+	a.NoError(err)
+
+	b, err := Base64Decode(b64)
+	a.NoError(err)
+
+	key := []byte("YELLOW SUBMARINE")
+	DecryptAESEBC(b, key)
+
+	a.True(strings.HasPrefix(string(b), icePlaintext))
 }

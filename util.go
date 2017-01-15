@@ -1,6 +1,7 @@
 package cryptopals
 
 import (
+	"crypto/aes"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
@@ -236,4 +237,20 @@ func makeBlocks(b []byte, blocksize, numBlocks int) [][]byte {
 		blocks[i] = b[blocksize*i : (blocksize*i)+blocksize]
 	}
 	return blocks
+}
+
+// DecryptAESEBC decrypts encrypted data b in place using given key
+// Equivalent in openssl commandline:
+// fmt.Sprintf(openssl enc -aes-128-ecb -a -d -K '%s' -nosalt -in 7.txt", hex.EncodeToString(key))
+func DecryptAESEBC(b, key []byte) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if aes.BlockSize != len(key) {
+		panic(err.Error())
+	}
+	mode := NewECBDecrypter(block)
+	mode.CryptBlocks(b, b)
 }
