@@ -3,6 +3,7 @@ package cryptopals
 import (
 	"encoding/hex"
 	"io/ioutil"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -86,4 +87,24 @@ func TestC3(t *testing.T) {
 	a.NoError(err)
 	r := BruteforceXOR(bIn1)
 	a.Equal("Cooking MC's like a pound of bacon", r.Plaintext)
+}
+
+func TestC4(t *testing.T) {
+	a := assert.New(t)
+
+	b, err := ioutil.ReadFile("4.txt")
+	if err != nil {
+		panic(err.Error())
+	}
+	lines := strings.Split(string(b), "\n")
+	topResult := &Result{}
+	for _, s := range lines {
+		bIn, err := hex.DecodeString(s)
+		a.NoError(err)
+		result := BruteforceXOR(bIn)
+		if result.Score > topResult.Score {
+			topResult = result
+		}
+	}
+	a.Equal("Now that the party is jumping\n", topResult.Plaintext)
 }
