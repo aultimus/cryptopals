@@ -64,7 +64,7 @@ func TestHammingDistance(t *testing.T) {
 func TestDetermineKeysize(t *testing.T) {
 	a := assert.New(t)
 
-	b64, err := ioutil.ReadFile("s1c6/6.txt")
+	b64, err := ioutil.ReadFile("6.txt")
 	if err != nil {
 		panic(err.Error())
 	}
