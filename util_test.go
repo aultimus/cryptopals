@@ -65,15 +65,11 @@ func TestDetermineKeysize(t *testing.T) {
 	a := assert.New(t)
 
 	b64, err := ioutil.ReadFile("6.txt")
-	if err != nil {
-		panic(err.Error())
-	}
+	a.NoError(err)
 
 	// Decode from base64
 	b, err := Base64Decode(b64)
-	if err != nil {
-		panic(err.Error())
-	}
+	a.NoError(err)
 
 	keysize, _ := DetermineKeysize(b)
 	a.Equal(29, keysize)
@@ -93,9 +89,8 @@ func TestC4(t *testing.T) {
 	a := assert.New(t)
 
 	b, err := ioutil.ReadFile("4.txt")
-	if err != nil {
-		panic(err.Error())
-	}
+	a.NoError(err)
+
 	lines := strings.Split(string(b), "\n")
 	topResult := &Result{}
 	for _, s := range lines {
