@@ -1,6 +1,7 @@
 package cryptopals
 
 import (
+	"bytes"
 	"encoding/hex"
 	"io/ioutil"
 	"strings"
@@ -212,4 +213,22 @@ func TestC7(t *testing.T) {
 	DecryptAESECB(b, key)
 
 	a.True(strings.HasPrefix(string(b), icePlaintext))
+}
+
+func TestC8(t *testing.T) {
+	a := assert.New(t)
+
+	b, err := ioutil.ReadFile("8.txt")
+	a.NoError(err)
+
+	lines := bytes.Split(bytes.Trim(b, "\n"), []byte("\n"))
+
+	for lineNo, line := range lines {
+		detected := DetectECB(line)
+		if detected {
+			a.Equal(132, lineNo)
+		} else {
+			a.NotEqual(132, lineNo)
+		}
+	}
 }

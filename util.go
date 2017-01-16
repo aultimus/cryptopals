@@ -1,6 +1,7 @@
 package cryptopals
 
 import (
+	"bytes"
 	"crypto/aes"
 	"encoding/base64"
 	"encoding/hex"
@@ -253,4 +254,21 @@ func DecryptAESECB(b, key []byte) {
 	}
 	mode := NewECBDecrypter(block)
 	mode.CryptBlocks(b, b)
+}
+
+// DetectECB detects if ciphertext b is encrypted via ECB
+func DetectECB(b []byte) bool {
+	// Assume 128 bit encryption
+	blockSize := 16
+
+	// Look for repeated sequences of size blockSize
+	// We are assuming that the plaintext has repetitions of at least
+	// 16 Bytes
+	for i := 0; i < len(b)-blockSize; i++ {
+		currentBlock := b[i : i+blockSize]
+		if bytes.Count(b, currentBlock) > 1 {
+			return true
+		}
+	}
+	return false
 }
