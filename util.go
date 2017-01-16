@@ -240,10 +240,10 @@ func makeBlocks(b []byte, blocksize, numBlocks int) [][]byte {
 	return blocks
 }
 
-// DecryptAESECB decrypts encrypted data b in place using given key
+// DecryptAESECB decrypts encrypted data b using given key
 // Equivalent in openssl commandline:
 // fmt.Sprintf(openssl enc -aes-128-ecb -a -d -K '%s' -nosalt -in 7.txt", hex.EncodeToString(key))
-func DecryptAESECB(b, key []byte) {
+func DecryptAESECB(b, key []byte) []byte {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err.Error())
@@ -252,8 +252,37 @@ func DecryptAESECB(b, key []byte) {
 	if aes.BlockSize != len(key) {
 		panic(err.Error())
 	}
+
 	mode := NewECBDecrypter(block)
 	mode.CryptBlocks(b, b)
+	return PKCS7Unpad(b, len(key))
+
+}
+
+// EncryptAESECB encrypts data b using given key
+func EncryptAESECB(b, key []byte) []byte {
+	// Take a copy as we need to return a copy as we may enlarge
+	// and therefore it is unecessary to alter original data
+	d := make([]byte, len(b))
+	copy(d, b)
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if aes.BlockSize != len(key) {
+		panic(err.Error())
+	}
+
+	if len(d)%len(key) != 0 {
+		// add padding
+		d = PKCS7Pad(d, len(key))
+	}
+
+	mode := NewECBEncrypter(block)
+	mode.CryptBlocks(d, d)
+	return d
 }
 
 // DetectECB detects if ciphertext b is encrypted via ECB
@@ -284,7 +313,40 @@ func PKCS7Pad(b []byte, blockSize int) []byte {
 	// value k - (l mod k), where l is the length of the input, and k the block
 	// size.
 	padAmount := blockSize - len(b)%blockSize
+	fmt.Printf("adding %d bytes of padding\n", padAmount)
 	padVal := []byte{byte(padAmount)}
 	padding := bytes.Repeat(padVal, padAmount)
 	return append(b, padding...)
+}
+
+// PKCS7Unpad strips padding from unencrypted data b
+func PKCS7Unpad(b []byte, blockSize int) []byte {
+	if blockSize < 1 || blockSize > 255 {
+		panic(fmt.Sprintf("PKCS7Unpad unsupported blocksize %d", blockSize))
+	}
+	if len(b)%blockSize != 0 {
+		panic("PKCS7Unpad b % blocksize != 0")
+	}
+
+	padVal := int(b[len(b)-1])
+	if padVal == 1 {
+		fmt.Println("stripping 1 byte of padding")
+		return b[:len(b)-1]
+	}
+
+	if padVal != int(b[len(b)-2]) {
+		fmt.Println("No padding to remove")
+		return b
+	}
+
+	// verify padding is as expected
+	for i := 2; i < padVal; i++ {
+		val := b[len(b)-i]
+		if val != byte(padVal) {
+			panic(fmt.Sprintf("unexpected non-padding %v, expected %v",
+				val, byte(padVal)))
+		}
+	}
+	fmt.Printf("stripping %d bytes of padding\n", padVal)
+	return b[:len(b)-padVal]
 }
