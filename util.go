@@ -272,3 +272,19 @@ func DetectECB(b []byte) bool {
 	}
 	return false
 }
+
+// PKCS7Pad pads data b upto nearest multiple of blocksize
+// PKCS#7 padding should work for any block size from 1 to 255 bytes
+func PKCS7Pad(b []byte, blockSize int) []byte {
+	if blockSize < 1 || blockSize > 255 {
+		panic(fmt.Sprintf("PKCS7Pad unsupported blocksize %d", blockSize))
+	}
+
+	// pad the input at the trailing end with k - (l mod k) octets all having
+	// value k - (l mod k), where l is the length of the input, and k the block
+	// size.
+	padAmount := blockSize - len(b)%blockSize
+	padVal := []byte{byte(padAmount)}
+	padding := bytes.Repeat(padVal, padAmount)
+	return append(b, padding...)
+}
