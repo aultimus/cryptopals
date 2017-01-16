@@ -239,10 +239,10 @@ func makeBlocks(b []byte, blocksize, numBlocks int) [][]byte {
 	return blocks
 }
 
-// DecryptAESEBC decrypts encrypted data b in place using given key
+// DecryptAESECB decrypts encrypted data b in place using given key
 // Equivalent in openssl commandline:
 // fmt.Sprintf(openssl enc -aes-128-ecb -a -d -K '%s' -nosalt -in 7.txt", hex.EncodeToString(key))
-func DecryptAESEBC(b, key []byte) {
+func DecryptAESECB(b, key []byte) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err.Error())

@@ -214,7 +214,7 @@ func TestC7(t *testing.T) {
 	a.NoError(err)
 
 	key := []byte("YELLOW SUBMARINE")
-	DecryptAESEBC(b, key)
+	DecryptAESECB(b, key)
 
 	a.True(strings.HasPrefix(string(b), icePlaintext))
 }
