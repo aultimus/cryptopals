@@ -36,4 +36,21 @@ class C3(unittest.TestCase):
         r = crypto.bruteforce_xor(bIn)
         self.assertEqual("Cooking MC's like a pound of bacon", r.plaintext)
 
+
+class C4(unittest.TestCase):
+
+    def runTest(self):
+        with open("../data/4.txt") as f:
+            lines = f.readlines()
+
+        top_result = crypto.Result("", bytes(), 0)
+        for l in lines:
+            l = l.rstrip("\n")
+            b = bytes.fromhex(l)
+            result = crypto.bruteforce_xor(b)
+            if result.score > top_result.score:
+                top_result = result
+        self.assertEqual("Now that the party is jumping\n",
+                         top_result.plaintext)
+
 unittest.main()

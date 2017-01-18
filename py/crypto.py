@@ -57,7 +57,10 @@ def bruteforce_xor(b_in):
     top_result = Result("", bytes(1), 0)
     for i in range(0, 128):
         cipher = bytes([i])
-        plaintext = xor(b_in, cipher).decode("ascii")
+        try:
+            plaintext = xor(b_in, cipher).decode("ascii")
+        except UnicodeDecodeError:
+            continue
         score = score_plaintext(plaintext)
         if score > top_result.score:
             top_result = Result(
