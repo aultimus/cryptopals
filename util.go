@@ -240,10 +240,30 @@ func makeBlocks(b []byte, blocksize, numBlocks int) [][]byte {
 	return blocks
 }
 
+// makeBlocksIrregular splits b into blocks of size blockSize
+// but leaves the last block short if len(b) is not a multiple of blocksize
+func makeBlocksIrregular(b []byte, blockSize int) [][]byte {
+	blocks := makeBlocks(b, blockSize, len(b)/blockSize)
+	remainder := len(b) % blockSize
+	if remainder == 0 {
+		return blocks
+	}
+	// OPTIMISATION is this inefficient, are we causing a reslice?
+	// best to avoid append where possible
+	lastBlock := b[len(blocks)*blockSize : len(b)]
+	return append(blocks, lastBlock)
+}
+
 // DecryptAESECB decrypts encrypted data b using given key
 // Equivalent in openssl commandline:
 // fmt.Sprintf(openssl enc -aes-128-ecb -a -d -K '%s' -nosalt -in 7.txt", hex.EncodeToString(key))
 func DecryptAESECB(b, key []byte) []byte {
+	return PKCS7Unpad(decryptAESECBNoPad(b, key), len(key))
+}
+
+func decryptAESECBNoPad(b, key []byte) []byte {
+	d := make([]byte, len(b))
+	copy(d, b)
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err.Error())
@@ -254,9 +274,8 @@ func DecryptAESECB(b, key []byte) []byte {
 	}
 
 	mode := NewECBDecrypter(block)
-	mode.CryptBlocks(b, b)
-	return PKCS7Unpad(b, len(key))
-
+	mode.CryptBlocks(d, d)
+	return d
 }
 
 // EncryptAESECB encrypts data b using given key
@@ -349,4 +368,60 @@ func PKCS7Unpad(b []byte, blockSize int) []byte {
 	}
 	fmt.Printf("stripping %d bytes of padding\n", padVal)
 	return b[:len(b)-padVal]
+}
+
+// CBCEncrypt - Cipher Block Chaining AES encryption
+// likely less efficient than the crypto lib impl
+func CBCEncrypt(b []byte, key []byte, iv []byte) []byte {
+	// TODO: add padding for last block so this works where len(b) % len(key) != 0
+	blockSize := len(key)
+	blocks := makeBlocksIrregular(b, blockSize)
+
+	lenWithPadding := len(b) + (blockSize - len(b)%blockSize)
+	cbcCipherText := make([]byte, lenWithPadding) // may need to be longer to accomodate padding
+
+	prevCipherText := iv
+	for i := 0; i < len(blocks); i++ {
+		if len(blocks[i]) != blockSize {
+			if i != len(blocks)-1 {
+				panic("irregular block that is not last block")
+			}
+			blocks[i] = PKCS7Pad(blocks[i], blockSize)
+		}
+		prevCipherText = EncryptAESECB(Xor(blocks[i], prevCipherText), key)
+		for j := 0; j < blockSize; j++ {
+			cbcCipherText[i*blockSize+j] = prevCipherText[j]
+		}
+	}
+	return cbcCipherText
+}
+
+// CBCDecrypt - Cipher Block Chaining AES decryption
+// likely less efficient than the crypto lib impl
+func CBCDecrypt(b []byte, key []byte, iv []byte) []byte {
+	blockSize := len(key)
+	blocks := makeBlocksIrregular(b, blockSize)
+
+	plaintext := make([]byte, len(b)) // this may be too long due to padding
+
+	prevBlock := iv
+	for i := 0; i < len(blocks); i++ {
+		xoredBlock := decryptAESECBNoPad(blocks[i], key)
+		plaintextBlock := Xor(xoredBlock, prevBlock)
+		prevBlock = blocks[i]
+
+		// depad last block once unencrypted
+		if i == len(blocks)-1 {
+			plaintextBlock = PKCS7Unpad(plaintextBlock, blockSize)
+			amountPadding := blockSize - len(plaintextBlock)
+			// This
+			plaintext = plaintext[:len(plaintext)-amountPadding]
+		}
+
+		for j := 0; j < len(plaintextBlock); j++ {
+			plaintext[i*blockSize+j] = plaintextBlock[j]
+		}
+
+	}
+	return plaintext
 }

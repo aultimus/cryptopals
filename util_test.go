@@ -68,3 +68,18 @@ func TestPKCS7PadUnpad(t *testing.T) {
 	a.Equal(15, len(byOne)%16)
 	testPadding(a, byOne)
 }
+
+func TestAESCBCEncryptDecrypt(t *testing.T) {
+	a := assert.New(t)
+
+	expectedPlaintext := "Everywhere he goes, Bodger always knows, Badger and his Badger mates are never far away!... Bodger and Badger! Bodger and Badger! La la la la la Badgers never far away..! Everybody knows, Badger loves, Mash Potato! He makes them into shapes and eats them everyday…! Bodger and Badger! Bodger and badger! La la la la la, la la la la la, Everywhere he goes, Bodger always knows, Badger and his Badger mates are never far away..! Bodger and Badger! Bodger and Badger! La la la la la, la la la la la. Bodger and Badger are never far away!"
+	key := []byte("QWERTYASDFGZXCVB")
+	iv := bytes.Repeat([]byte{byte(0)}, 16)
+	a.Equal(16, len(key))
+	a.Equal(16, len(iv))
+
+	cipherText := CBCEncrypt([]byte(expectedPlaintext), key, iv)
+
+	actualPlaintext := CBCDecrypt(cipherText, key, iv)
+	a.Equal(expectedPlaintext, string(actualPlaintext))
+}

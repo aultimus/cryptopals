@@ -13,3 +13,16 @@ func TestC9(t *testing.T) {
 	expected := []byte("YELLOW SUBMARINE\x04\x04\x04\x04")
 	a.Equal(expected, actual)
 }
+
+/*
+func TestC10(t *testing.T) {
+	a := assert.New(t)
+
+	b, err := ioutil.ReadFile("10.txt")
+	a.NoError(err)
+
+	key := []byte("YELLOW SUBMARINE")
+	iv := bytes.Repeat([]byte{byte(0)}, 16)
+	fmt.Println(string(CBCDecrypt(b, key, iv)))
+}
+*/
