@@ -27,4 +27,13 @@ class C2(unittest.TestCase):
         actual = crypto.xor(bIn1, bIn2)
         self.assertEqual(actual, expected)
 
+
+class C3(unittest.TestCase):
+
+    def runTest(self):
+        bIn = bytes.fromhex("1b37373331363f78151b7f2b783431333d783978283"
+                            "72d363c78373e783a393b3736")
+        r = crypto.bruteforce_xor(bIn)
+        self.assertEqual("Cooking MC's like a pound of bacon", r.plaintext)
+
 unittest.main()
