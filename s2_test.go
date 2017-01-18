@@ -18,7 +18,7 @@ func TestC9(t *testing.T) {
 func TestC10(t *testing.T) {
 	a := assert.New(t)
 
-	b, err := ioutil.ReadFile("10.txt")
+	b, err := ioutil.ReadFile("data/10.txt")
 	a.NoError(err)
 
 	key := []byte("YELLOW SUBMARINE")

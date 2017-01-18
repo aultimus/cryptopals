@@ -21,7 +21,7 @@ func TestHammingDistance(t *testing.T) {
 func TestDetermineKeysize(t *testing.T) {
 	a := assert.New(t)
 
-	b64, err := ioutil.ReadFile("6.txt")
+	b64, err := ioutil.ReadFile("data/6.txt")
 	a.NoError(err)
 
 	// Decode from base64

@@ -51,7 +51,7 @@ func TestC3(t *testing.T) {
 func TestC4(t *testing.T) {
 	a := assert.New(t)
 
-	b, err := ioutil.ReadFile("4.txt")
+	b, err := ioutil.ReadFile("data/4.txt")
 	a.NoError(err)
 
 	lines := strings.Split(string(b), "\n")
@@ -165,7 +165,7 @@ func TestC6(t *testing.T) {
 	a := assert.New(t)
 
 	// Read Data
-	b64, err := ioutil.ReadFile("6.txt")
+	b64, err := ioutil.ReadFile("data/6.txt")
 	a.NoError(err)
 
 	// Decode from base64
@@ -179,7 +179,7 @@ func TestC6(t *testing.T) {
 func TestC7(t *testing.T) {
 	a := assert.New(t)
 
-	b64, err := ioutil.ReadFile("7.txt")
+	b64, err := ioutil.ReadFile("data/7.txt")
 	a.NoError(err)
 
 	b, err := Base64Decode(b64)
@@ -194,7 +194,7 @@ func TestC7(t *testing.T) {
 func TestC8(t *testing.T) {
 	a := assert.New(t)
 
-	b, err := ioutil.ReadFile("8.txt")
+	b, err := ioutil.ReadFile("data/8.txt")
 	a.NoError(err)
 
 	lines := bytes.Split(bytes.Trim(b, "\n"), []byte("\n"))
