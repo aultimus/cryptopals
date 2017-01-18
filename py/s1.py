@@ -53,4 +53,18 @@ class C4(unittest.TestCase):
         self.assertEqual("Now that the party is jumping\n",
                          top_result.plaintext)
 
+
+class C5(unittest.TestCase):
+
+    def runTest(self):
+        in1 = b"Burning 'em, if you ain't quick and nimble\n" \
+              b"I go crazy when I hear a cymbal"
+        in2 = b"ICE"
+        expected = b"0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343" \
+                   b"c2a26226324272765272a282b2f20430a652e2c652a3124333a653e" \
+                   b"2b2027630c692b20283165286326302e27282f"
+        actual_bytes = crypto.xor(in1, in2)
+        actual_hex = binascii.hexlify(actual_bytes)
+        self.assertEqual(expected, actual_hex)
+
 unittest.main()
