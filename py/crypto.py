@@ -52,8 +52,9 @@ Result = namedtuple("Result", ["plaintext", "cipher", "score"])
 
 
 def bruteforce_xor(b_in):
-    """bruteforce_xor searches for a single character XOR cypher that yields the
-    most likely plaintext by trying all possible single character ciphers"""
+    """bruteforce_xor searches for a single character XOR cypher that yields
+    the most likely plaintext by trying all possible single character
+    ciphers"""
     top_result = Result("", bytes(1), 0)
     for i in range(0, 128):
         cipher = bytes([i])
