@@ -131,7 +131,7 @@ func ScorePlaintext(s string) float64 {
 func HammingDistance(bs ...[]byte) float64 {
 	var total float64
 	if len(bs) < 2 {
-		panic(fmt.Sprintf("HammingDistanceAverage called with only %d args, requires at least 2",
+		panic(fmt.Sprintf("HammingDistance called with only %d args, requires at least 2",
 			len(bs)))
 	}
 	var numIter int

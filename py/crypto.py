@@ -76,3 +76,84 @@ def score_plaintext(s):
     """score_plaintext scores a string for confidence that is plaintext,
     the higher the score, the higher the confidence"""
     return sum([letter_frequency.get(c, 0) for c in s])
+
+
+def break_repeating_key_xor(b):
+    keysize, distance = determine_keysize(b)
+    print("Likely keysize %d has normalised hamming distance of %f\n" %
+         (keysize, distance))
+
+    # break data into keysize blocks of len keysize
+    blocks = [b[i*keysize:(i+1)*keysize] for i in range(0, keysize)]
+
+    # transpose blocks so each block is composed of ciphertext encrypted with
+    # the same key of the cipher
+    transposed = []
+    for i in range(keysize):
+        block = bytearray(keysize)
+        for j in range(keysize):
+            block[j] = blocks[j][i]
+        transposed.append(block)
+
+    # bruteforce each cipher character using the block of ciphertext
+    # encrypted by that cipher character
+    cipher = bytes()
+    for block in transposed:
+        cipher += bruteforce_xor(block).cipher
+    return xor(b, cipher)
+
+
+def determine_keysize(b):
+    """ determine_keysize determines the likely keysize of an encryption cypher
+    given the encrypted data b. It also returns normalised difference of the
+    blocks of size keysize, this can be considered a sort of confidence, the
+    lower the better"""
+    shortest_distance = 1000.0
+    likely_keysize = -1
+    for keysize in range(2, 41):
+        distance = hamming_distance(
+            b[:keysize],
+            b[keysize:keysize*2],
+            b[keysize*2:keysize*3],
+            b[keysize*3:keysize*4])
+        normalised_distance = distance / keysize
+        if normalised_distance < shortest_distance:
+            shortest_distance = normalised_distance
+            likely_keysize = keysize
+    return likely_keysize, shortest_distance
+
+
+def hamming_distance(*bs):
+    if len(bs) < 2:
+        raise ValueError("hamming_distance called with only " +
+                         "%d args, requires at least 2" % len(bs))
+
+    total = 0.0
+    num_iter = 0.0
+    for i in range(0, len(bs)):
+        for j in range(i+1, len(bs)):
+            dist = hamming_distance_impl(bs[i], bs[j])
+            #print("%d %d has distance of %d\n" % (i, j, dist))
+            total += dist
+            num_iter += 1
+    total /= num_iter  # normalise
+    return total
+
+
+def hamming_distance_impl(b1, b2):
+    if len(b1) != len(b2):
+        raise ValueError("hamming_distance_impl called with different " +
+                         "length buffers len(b1)=%d, len(b2)=%d" %
+                         (len(b1), len(b2)))
+
+    total = 0
+    for i in range(0, len(b1)):
+        # xor args, thus val represents the number of bits set
+        val = b1[i] ^ b2[i]
+
+        # increment total by one and clear a bit
+        while val != 0:
+            total += 1
+            val &= val-1
+
+    return total

@@ -1,3 +1,4 @@
+import base64
 import binascii
 import crypto
 import unittest
@@ -66,5 +67,18 @@ class C5(unittest.TestCase):
         actual_bytes = crypto.xor(in1, in2)
         actual_hex = binascii.hexlify(actual_bytes)
         self.assertEqual(expected, actual_hex)
+
+with open("../data/ice.txt") as f:
+    ice_plaintext = f.read()
+
+
+class C6(unittest.TestCase):
+
+    def runTest(self):
+        with open("../data/6.txt") as f:
+            b64 = f.read()
+        b = base64.b64decode(b64)
+        plaintext = crypto.break_repeating_key_xor(b).decode()
+        self.assertEqual(plaintext, ice_plaintext)
 
 unittest.main()
