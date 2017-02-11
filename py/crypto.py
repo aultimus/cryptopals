@@ -1,4 +1,5 @@
 from collections import namedtuple
+from Crypto.Cipher import AES
 
 
 def xor(b1, b2):
@@ -170,3 +171,8 @@ def hamming_distance_impl(b1, b2):
             val &= val - 1
 
     return total
+
+
+def decrypt_aes_ecb(src, key):
+    cipher = AES.new(key)
+    return cipher.decrypt(src)

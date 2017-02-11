@@ -81,4 +81,20 @@ class C6(unittest.TestCase):
         plaintext = crypto.break_repeating_key_xor(b).decode()
         self.assertEqual(plaintext, ice_plaintext)
 
+
+class C7(unittest.TestCase):
+
+    def runTest(self):
+        with open("../data/7.txt") as f:
+            b64 = f.read()
+        b = base64.b64decode(b64)
+
+        key = b"YELLOW SUBMARINE"
+        actual_plaintext = crypto.decrypt_aes_ecb(b, key).decode()
+
+        # cipher only  works in multiples of blocksize,
+        # so chop down to match size of data
+        actual_plaintext = actual_plaintext[:len(ice_plaintext)]
+        self.assertEqual(actual_plaintext, ice_plaintext)
+
 unittest.main()
