@@ -176,3 +176,17 @@ def hamming_distance_impl(b1, b2):
 def decrypt_aes_ecb(src, key):
     cipher = AES.new(key)
     return cipher.decrypt(src)
+
+
+def detect_ecb(b):
+    # assume 128 bit encryption
+    block_size = 16
+
+    # Look for repeated sequences of size blockSize
+    # We are assuming that the plaintext has repetitions of at least
+    # 16 Bytes
+    for i in range(0, len(b) - block_size):
+        block = b[i: i + block_size]
+        if b.count(block) > 1:
+            return True
+    return False

@@ -97,4 +97,16 @@ class C7(unittest.TestCase):
         actual_plaintext = actual_plaintext[:len(ice_plaintext)]
         self.assertEqual(actual_plaintext, ice_plaintext)
 
+
+class C8(unittest.TestCase):
+
+    def runTest(self):
+        with open("../data/8.txt") as f:
+            lines = f.readlines()
+        for i in range(0, len(lines)):
+            if crypto.detect_ecb(lines[i]):
+                self.assertEqual(132, i)
+            else:
+                self.assertNotEqual(132, i)
+
 unittest.main()
