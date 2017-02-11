@@ -84,16 +84,11 @@ def break_repeating_key_xor(b):
           (keysize, distance))
 
     # break data into keysize blocks of len keysize
-    blocks = [b[i * keysize:(i + 1) * keysize] for i in range(0, keysize)]
+    blocks = make_blocks(b, keysize, keysize)
 
     # transpose blocks so each block is composed of ciphertext encrypted with
     # the same key of the cipher
-    transposed = []
-    for i in range(keysize):
-        block = bytearray(keysize)
-        for j in range(keysize):
-            block[j] = blocks[j][i]
-        transposed.append(block)
+    transposed = transpose_blocks(blocks)
 
     # bruteforce each cipher character using the block of ciphertext
     # encrypted by that cipher character
@@ -101,6 +96,24 @@ def break_repeating_key_xor(b):
     for block in transposed:
         cipher += bruteforce_xor(block).cipher
     return xor(b, cipher)
+
+
+def make_blocks(b, num_blocks, block_size):
+    return [b[i * block_size:(i + 1) * block_size]
+            for i in range(0, num_blocks)]
+
+
+def transpose_blocks(blocks):
+    transposed = []
+    l = len(blocks)
+    for i in range(l):
+        if len(blocks[i]) != l:
+            raise ValueError("transpose_blocks only accepts a square 2d array")
+        block = bytearray(l)
+        for j in range(l):
+            block[j] = blocks[j][i]
+        transposed.append(block)
+    return transposed
 
 
 def determine_keysize(b):
