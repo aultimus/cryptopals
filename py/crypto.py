@@ -81,10 +81,10 @@ def score_plaintext(s):
 def break_repeating_key_xor(b):
     keysize, distance = determine_keysize(b)
     print("Likely keysize %d has normalised hamming distance of %f\n" %
-         (keysize, distance))
+          (keysize, distance))
 
     # break data into keysize blocks of len keysize
-    blocks = [b[i*keysize:(i+1)*keysize] for i in range(0, keysize)]
+    blocks = [b[i * keysize:(i + 1) * keysize] for i in range(0, keysize)]
 
     # transpose blocks so each block is composed of ciphertext encrypted with
     # the same key of the cipher
@@ -113,9 +113,9 @@ def determine_keysize(b):
     for keysize in range(2, 41):
         distance = hamming_distance(
             b[:keysize],
-            b[keysize:keysize*2],
-            b[keysize*2:keysize*3],
-            b[keysize*3:keysize*4])
+            b[keysize:keysize * 2],
+            b[keysize * 2:keysize * 3],
+            b[keysize * 3:keysize * 4])
         normalised_distance = distance / keysize
         if normalised_distance < shortest_distance:
             shortest_distance = normalised_distance
@@ -131,7 +131,7 @@ def hamming_distance(*bs):
     total = 0.0
     num_iter = 0.0
     for i in range(0, len(bs)):
-        for j in range(i+1, len(bs)):
+        for j in range(i + 1, len(bs)):
             dist = hamming_distance_impl(bs[i], bs[j])
             #print("%d %d has distance of %d\n" % (i, j, dist))
             total += dist
@@ -154,6 +154,6 @@ def hamming_distance_impl(b1, b2):
         # increment total by one and clear a bit
         while val != 0:
             total += 1
-            val &= val-1
+            val &= val - 1
 
     return total
