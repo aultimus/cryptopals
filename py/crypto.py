@@ -190,3 +190,21 @@ def detect_ecb(b):
         if b.count(block) > 1:
             return True
     return False
+
+
+def pkcs7pad(b, block_size):
+    """ PKCS7Pad pads data b upto nearest multiple of blocksize
+    PKCS#7 padding should work for any block size from 1 to 255 bytes"""
+
+    if block_size < 1 or block_size > 255:
+        raise ValueError("pkcs7pad: unsupported blocksize %d" % block_size)
+
+    # pad the input at the trailing end with k - (l mod k) octets all having
+    # value k - (l mod k), where l is the length of the input, and k the block
+    # size.
+    pad_amount = block_size - len(b) % block_size
+    print("padding %d bytes" % pad_amount)
+    padding = bytes(pad_amount for i in range(0, pad_amount))
+
+    #padding = bytes(pad_value) * pad_amount
+    return b + padding
